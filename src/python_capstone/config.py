@@ -33,9 +33,9 @@ class Settings:
 
         return cls(
             gemini_api_key=SecretStr(raw_api_key),
-            gemini_chat_model=os.environ.get("GEMINI_CHAT_MODEL", "gemini-2.5-flash"),
+            gemini_chat_model=os.environ.get("GEMINI_CHAT_MODEL", "gemini-3.6-flash"),
             gemini_embedding_model=os.environ.get(
-                "GEMINI_EMBEDDING_MODEL", "models/embedding-001"
+                "GEMINI_EMBEDDING_MODEL", "models/gemini-embedding-001"
             ),
             chroma_persist_dir=PROJECT_ROOT
             / os.environ.get("CHROMA_PERSIST_DIR", "chroma_db"),
