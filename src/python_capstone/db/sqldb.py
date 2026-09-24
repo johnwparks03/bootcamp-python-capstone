@@ -49,3 +49,31 @@ def format_schema(tables: list[TableInfo]) -> str:
 
     return "\n\n".join(table_blocks)
 
+
+def execute_query(dbconn: sqlite3.Connection, sql: str) -> tuple[list[str], list[tuple]]:
+    cursor = dbconn.execute(sql)
+    column_names = [description[0] for description in cursor.description]
+    rows = cursor.fetchall()
+    return column_names, rows
+
+
+def format_results(columns: list[str], rows: list[tuple]) -> str:
+    if not rows:
+        return " | ".join(columns)
+
+    str_rows = [[str(value) for value in row] for row in rows]
+
+    widths = [
+        max(len(columns[i]), max(len(row[i]) for row in str_rows))
+        for i in range(len(columns))
+    ]
+
+    header = " | ".join(columns[i].ljust(widths[i]) for i in range(len(columns)))
+    separator = "-+-".join("-" * widths[i] for i in range(len(columns)))
+    body_lines = [
+        " | ".join(row[i].ljust(widths[i]) for i in range(len(columns)))
+        for row in str_rows
+    ]
+
+    return "\n".join([header, separator, *body_lines])
+
