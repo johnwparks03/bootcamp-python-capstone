@@ -5,19 +5,16 @@ from __future__ import annotations
 from pathlib import Path
 from typing import cast
 
-import chromadb
-from chromadb.api import ClientAPI
-from chromadb.api.models.Collection import Collection
 from chromadb.api.types import Metadata, PyEmbedding
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from python_capstone.config import PROJECT_ROOT, settings
+from python_capstone.db.vectorstore import COLLECTION_NAME, open_collection
 from python_capstone.llm.gemini_embedding_provider import GeminiEmbeddingProvider
 from python_capstone.logging_conf import configure_logging, get_logger
 
 
 POLICY_DOCS_DIR = PROJECT_ROOT / "data" / "policy_docs"
-COLLECTION_NAME = "policy_docs"
 CHUNK_SIZE = 800
 CHUNK_OVERLAP = 100
 
@@ -58,30 +55,6 @@ def chunk_documents(
     return chunk_ids, chunk_texts, chunk_metadatas
 
 
-def get_verified_collection(client: ClientAPI) -> Collection:
-    """Open (or create) the collection, guarding against embedding-model drift.
-
-    A collection embedded with one model isn't comparable to vectors from a
-    different model. We stamp the model name as metadata on first creation,
-    then check it on every subsequent open and fail loudly on mismatch
-    rather than silently returning bad similarity matches.
-    """
-    collection = client.get_or_create_collection(
-        COLLECTION_NAME,
-        metadata={"embedding_model": settings.gemini_embedding_model},
-    )
-
-    stored_model = collection.metadata.get("embedding_model") if collection.metadata else None
-    if stored_model != settings.gemini_embedding_model:
-        raise RuntimeError(
-            f"Collection '{COLLECTION_NAME}' was embedded with model '{stored_model}', "
-            f"but config now specifies '{settings.gemini_embedding_model}'. "
-            f"Delete {settings.chroma_persist_dir} and re-run ingestion, or revert the embedding model in .env."
-        )
-
-    return collection
-
-
 def main() -> None:
     configure_logging(settings.log_level)
 
@@ -97,8 +70,7 @@ def main() -> None:
     vectors = embedding_provider.embed(chunk_texts)
     log.info(f"computed {len(vectors)} embeddings")
 
-    client = chromadb.PersistentClient(path=str(settings.chroma_persist_dir))
-    collection = get_verified_collection(client)
+    collection = open_collection()
 
     collection.upsert(
         ids=chunk_ids,
