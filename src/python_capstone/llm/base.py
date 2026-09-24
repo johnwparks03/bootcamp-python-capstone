@@ -10,6 +10,14 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 
 
+class LLMGenerationError(Exception):
+    """Raised when a provider fails to generate a response (timeout, rate
+    limit, service unavailable, etc). Providers should catch their own
+    underlying SDK/API exceptions and re-raise this instead, so callers never
+    need to know which concrete provider is in use.
+    """
+
+
 class LLMProvider(ABC):
     @abstractmethod
     def generate(self, prompt: str) -> str:

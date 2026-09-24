@@ -5,7 +5,7 @@ from __future__ import annotations
 from langchain_google_genai import ChatGoogleGenerativeAI
 from pydantic import SecretStr
 
-from python_capstone.llm.base import LLMProvider
+from python_capstone.llm.base import LLMGenerationError, LLMProvider
 
 
 class GeminiProvider(LLMProvider):
@@ -13,7 +13,11 @@ class GeminiProvider(LLMProvider):
         self._client = ChatGoogleGenerativeAI(model=model, api_key=api_key)
 
     def generate(self, prompt: str) -> str:
-        response = self._client.invoke(prompt)
+        try:
+            response = self._client.invoke(prompt)
+        except Exception as e:
+            raise LLMGenerationError(f"Gemini API call failed: {e}") from e
+
         content = response.content
 
         if isinstance(content, str):
