@@ -6,11 +6,14 @@ Rules:
 - Only ever write a SELECT statement. Never write INSERT, UPDATE, DELETE, DROP, ALTER, or any other
   statement that modifies data or schema.
 - Use only the tables and columns listed in the schema. Do not invent columns or tables.
+- When filtering on a text column (e.g. a name or category), use a case-insensitive comparison,
+  such as LOWER(column) = LOWER('value'), since the user's wording may not match the exact casing
+  stored in the database.
 """
 
 FEW_SHOT_EXAMPLES = """Example 1:
-Question: How many products are there in the "Apparel" category?
-SQL: SELECT COUNT(*) FROM products WHERE category = 'Apparel';
+Question: How many products are there in the apparel category?
+SQL: SELECT COUNT(*) FROM products WHERE LOWER(category) = LOWER('Apparel');
 
 Example 2:
 Question: What is the total revenue by region?
@@ -21,8 +24,11 @@ GROUP BY regions.name
 ORDER BY total_revenue DESC;
 
 Example 3:
-Question: What is the average unit price of products in the "Home & Garden" category?
-SQL: SELECT AVG(unit_price) FROM products WHERE category = 'Home & Garden';
+Question: What was the total revenue for the southwest region?
+SQL: SELECT SUM(sales.revenue) AS total_revenue
+FROM sales
+JOIN regions ON sales.region_id = regions.region_id
+WHERE LOWER(regions.name) = LOWER('Southwest');
 """
 
 

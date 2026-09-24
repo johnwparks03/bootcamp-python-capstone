@@ -3,9 +3,9 @@ from dataclasses import dataclass, field
 
 from python_capstone.db.sqldb import execute_query, format_results
 from python_capstone.llm.base import LLMGenerationError, LLMProvider
-from python_capstone.nl_to_sql_agent.generate import generate_sql
-from python_capstone.nl_to_sql_agent.guardrail import UnsafeSqlError, validate_select_only
-from python_capstone.nl_to_sql_agent.insight import generate_insight
+from python_capstone.quantitative_agent.generate import generate_sql
+from python_capstone.quantitative_agent.guardrail import UnsafeSqlError, validate_select_only
+from python_capstone.quantitative_agent.insight import generate_insight
 
 
 @dataclass

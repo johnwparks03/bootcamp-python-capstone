@@ -1,7 +1,7 @@
 import re
 
 from python_capstone.llm.base import LLMProvider
-from python_capstone.nl_to_sql_agent.prompt import build_sql_prompt
+from python_capstone.quantitative_agent.prompt import build_sql_prompt
 
 FENCE_PATTERN = re.compile(r"^```(?:sql)?\s*|\s*```$", re.IGNORECASE | re.MULTILINE)
 
