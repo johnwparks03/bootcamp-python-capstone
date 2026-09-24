@@ -3,13 +3,14 @@
 from __future__ import annotations
 
 from langchain_google_genai import ChatGoogleGenerativeAI
+from pydantic import SecretStr
 
 from python_capstone.llm.base import LLMProvider
 
 
 class GeminiProvider(LLMProvider):
-    def __init__(self, api_key: str, model: str) -> None:
-        self._client = ChatGoogleGenerativeAI(model=model, google_api_key=api_key)
+    def __init__(self, api_key: SecretStr, model: str) -> None:
+        self._client = ChatGoogleGenerativeAI(model=model, api_key=api_key)
 
     def generate(self, prompt: str) -> str:
         response = self._client.invoke(prompt)
