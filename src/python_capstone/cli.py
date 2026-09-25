@@ -26,10 +26,8 @@ def build_dependencies():
     Kept separate from run_repl so tests can exercise the loop with fakes.
     """
     if settings.groq_api_key.get_secret_value() == "":
-        print("Using Gemini")
         llm_provider = GeminiProvider(api_key=settings.gemini_api_key, model=settings.gemini_chat_model)
     else:
-        print("Using Groq")
         llm_provider = GroqProvider(api_key=settings.groq_api_key, model=settings.groq_chat_model)
     embedding_provider = GeminiEmbeddingProvider(settings.gemini_api_key, settings.gemini_embedding_model)
     dbconn = open_connection()
