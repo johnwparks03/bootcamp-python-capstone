@@ -2,6 +2,7 @@ from rich.console import Console
 from rich.panel import Panel
 
 from python_capstone.config import settings
+from python_capstone.logging_conf import configure_logging
 from python_capstone.db.sqldb import format_schema, introspect_schema, open_connection
 from python_capstone.db.vectorstore import open_collection
 from python_capstone.llm.base import LLMGenerationError
@@ -57,6 +58,7 @@ def run_repl(llm_provider, embedding_provider, dbconn, schema, collection, conso
 
 
 def repl() -> None:
+    configure_logging()
     llm_provider, embedding_provider, dbconn, schema, collection = build_dependencies()
     run_repl(llm_provider, embedding_provider, dbconn, schema, collection, Console())
 

@@ -1,8 +1,10 @@
 import sqlite3
 from dataclasses import dataclass, field
+from time import perf_counter
 
 from chromadb.api.models.Collection import Collection
 
+from python_capstone.logging_conf import get_logger
 from python_capstone.llm.base import LLMProvider
 from python_capstone.llm.embedding_base import EmbeddingProvider
 from python_capstone.manager_agent.generate import ClassificationParseError, classify_question
@@ -16,6 +18,7 @@ CLARIFICATION_MESSAGE = (
     "or something outside what I can help with. Could you clarify what you're asking about?"
 )
 
+logger = get_logger(__name__)
 
 @dataclass
 class ManagerAnswer:
@@ -35,21 +38,26 @@ def answer_question(
 ) -> ManagerAnswer:
     try:
         classification = classify_question(llm_provider, question)
+        logger.info("Classified as %s | Reasoning: %s", classification.category, classification.reasoning)
     except ClassificationParseError as e:
+        logger.warning("Unable to route question %s", e)
         return ManagerAnswer(
             category="error",
             message=f"Sorry, I couldn't figure out how to route that question: {e}",
         )
 
     if classification.category == "quantitative":
+        logger.info("Selected Quantitative Agent")
         quantitative = answer_quantitative(llm_provider, dbconn, schema, question)
         return ManagerAnswer(category="quantitative", quantitative=quantitative)
 
     if classification.category == "qualitative":
+        logger.info("Selected Qualitative Agent")
         qualitative = answer_qualitative(embedding_provider, llm_provider, collection, question)
         return ManagerAnswer(category="qualitative", qualitative=qualitative)
 
     if classification.category == "both":
+        logger.info("Selected Both Agents")
         assert classification.qualitative_subquery is not None
         assert classification.quantitative_subquery is not None
         
