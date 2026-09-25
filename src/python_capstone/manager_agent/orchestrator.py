@@ -72,14 +72,13 @@ def answer_question(
 
     return ManagerAnswer(category="ambiguous", message=CLARIFICATION_MESSAGE)
 
-
 def format_answer(answer: ManagerAnswer) -> str:
     if answer.category in ("error", "ambiguous"):
         return answer.message
 
     if answer.category == "quantitative":
         assert answer.quantitative is not None
-        return f"From sales data:\n{answer.quantitative.formatted_table}\n\n{answer.quantitative.insight}"
+        return f"From sales data:\n{_format_quantitative(answer.quantitative)}"
 
     if answer.category == "qualitative":
         assert answer.qualitative is not None
@@ -87,8 +86,12 @@ def format_answer(answer: ManagerAnswer) -> str:
 
     assert answer.quantitative is not None
     assert answer.qualitative is not None
-    quantitative_section = (
-        f"From sales data:\n{answer.quantitative.formatted_table}\n\n{answer.quantitative.insight}"
-    )
+    quantitative_section = f"From sales data:\n{_format_quantitative(answer.quantitative)}"
     qualitative_section = f"From policy docs:\n{format_sources(answer.qualitative)}"
     return f"{quantitative_section}\n\n{qualitative_section}"
+
+
+def _format_quantitative(answer: QueryAnswer) -> str:
+    if answer.error is not None:
+        return answer.error
+    return f"{answer.formatted_table}\n\n{answer.insight}"
