@@ -7,6 +7,7 @@ from python_capstone.db.sqldb import format_schema, introspect_schema, open_conn
 from python_capstone.db.vectorstore import open_collection
 from python_capstone.llm.base import LLMGenerationError
 from python_capstone.llm.gemini_embedding_provider import GeminiEmbeddingProvider
+from python_capstone.llm.gemini_provider import GeminiProvider
 from python_capstone.llm.groq_provider import GroqProvider
 from python_capstone.manager_agent.generate import ClassificationParseError
 from python_capstone.manager_agent.orchestrator import answer_question, format_answer
@@ -24,7 +25,12 @@ def build_dependencies():
     """Constructs the real providers/DB connection/collection used by the CLI.
     Kept separate from run_repl so tests can exercise the loop with fakes.
     """
-    llm_provider = GroqProvider(api_key=settings.groq_api_key, model=settings.groq_chat_model)
+    if settings.groq_api_key.get_secret_value() == "":
+        print("Using Gemini")
+        llm_provider = GeminiProvider(api_key=settings.gemini_api_key, model=settings.gemini_chat_model)
+    else:
+        print("Using Groq")
+        llm_provider = GroqProvider(api_key=settings.groq_api_key, model=settings.groq_chat_model)
     embedding_provider = GeminiEmbeddingProvider(settings.gemini_api_key, settings.gemini_embedding_model)
     dbconn = open_connection()
     schema = format_schema(introspect_schema(dbconn))

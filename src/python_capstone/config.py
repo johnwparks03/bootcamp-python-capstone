@@ -34,10 +34,10 @@ class Settings:
             )
 
         raw_groq_api_key = os.environ.get("GROQ_API_KEY", "")
-        if not raw_groq_api_key:
-            raise RuntimeError(
-                "GROQ_API_KEY is not set. Copy .env.example to .env and fill it in."
-            )
+        # if not raw_groq_api_key:
+        #     raise RuntimeError(
+        #         "GROQ_API_KEY is not set. Copy .env.example to .env and fill it in."
+        #     )
 
         return cls(
             gemini_api_key=SecretStr(raw_gemini_api_key),
