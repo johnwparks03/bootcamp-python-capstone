@@ -92,7 +92,7 @@ Demonbreun Goods Assistant - Ask me anything! (type 'exit' to quit)
 
 ### Logs
 
-Logs are written via `logging_conf.py` and stored in 'src/python_capstone/logs.txt'
+Logs are written via `logging_conf.py` and stored in 'logs.txt'
 
 ## Data
 
