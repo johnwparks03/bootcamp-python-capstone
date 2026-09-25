@@ -45,6 +45,6 @@ def format_sources(answer: QualitativeAnswer) -> str:
     if not answer.chunks:
         return answer.answer
 
-    sources = "\n".join(f"  - [{chunk.chunk_id}] (distance: {chunk.distance:.4f})" for chunk in answer.chunks)
+    sources = "\n".join(f"  - {chunk.chunk_id} (distance: {chunk.distance:.4f})" for chunk in answer.chunks)
 
     return f"{answer.answer}\n\nSources:\n{sources}"
