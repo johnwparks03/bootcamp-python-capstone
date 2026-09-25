@@ -68,6 +68,8 @@ If you are running into errors/limits with Gemini. You can create a free API key
 
 To utilize the Groq api, set GROQ_API_KEY in .env and the LLM provider will automatically use Groq for API keys.
 
+Important Note: A Gemini API key is still required for embeddings
+
 ### Running the CLI
 
 ```bash
