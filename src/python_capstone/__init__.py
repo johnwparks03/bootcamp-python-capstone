@@ -1,2 +1,4 @@
 def main() -> None:
-    print("Hello from python-capstone!")
+    from python_capstone.cli import repl
+
+    repl()

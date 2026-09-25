@@ -19,15 +19,19 @@ STYLE_BY_CATEGORY = {
 }
 
 
-def repl() -> None:
-    console = Console()
-
+def build_dependencies():
+    """Constructs the real providers/DB connection/collection used by the CLI.
+    Kept separate from run_repl so tests can exercise the loop with fakes.
+    """
     llm_provider = GroqProvider(api_key=settings.groq_api_key, model=settings.groq_chat_model)
     embedding_provider = GeminiEmbeddingProvider(settings.gemini_api_key, settings.gemini_embedding_model)
     dbconn = open_connection()
     schema = format_schema(introspect_schema(dbconn))
     collection = open_collection()
+    return llm_provider, embedding_provider, dbconn, schema, collection
 
+
+def run_repl(llm_provider, embedding_provider, dbconn, schema, collection, console: Console) -> None:
     console.print("[bold cyan]Demonbreun Goods Assistant[/bold cyan] - Ask me anything! (type 'exit' to quit)\n")
 
     while True:
@@ -50,6 +54,11 @@ def repl() -> None:
             console.print(Panel(text, title=answer.category, border_style=style))
         except (UnsafeSqlError, LLMGenerationError, ClassificationParseError) as e:
             console.print(Panel(str(e), title="error", border_style="red"))
+
+
+def repl() -> None:
+    llm_provider, embedding_provider, dbconn, schema, collection = build_dependencies()
+    run_repl(llm_provider, embedding_provider, dbconn, schema, collection, Console())
 
 
 if __name__ == "__main__":
